@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Computação gráfica - e_folio_B</title>
+		<style>
+			body { margin: 0}
+			canvas { width: 100%; height: 100% }
+			#header2 {
+			position:absolute;
+			top: 40px;
+			left: 0px;
+			width: 100%;
+			text-align:center;
+			z-index:auto;
+			display:block;
+			color:red;
+			font-size: 30px;
+			}
+			#header3 {
+			position:absolute;
+			top: 30px;
+			left: 0px;
+			width: 100%;
+			text-align:left;
+			z-index:auto;
+			display:block;
+			color:red;
+			font-size: 20px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="header2">Computação gráfica - e-folio_B</div>
+		<div id="header3">Carregue nas setas direita ou <br>
+			esquerda para rodar a cabana, <br>
+			cima ou baixo para aumentar ou <br>
+			 diminuir o tamanho das árvores e <br>
+			  pressione enter para reset.</div>
+
+		<script src="js/three.js"></script>
+		<script>
+
+			// renderer
+			var renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+			// camera
+            var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
+            camera.position.set( 0, 0, 100 );
+            camera.lookAt( 0, 0, 0 );
+			var scene = new THREE.Scene();
+
+			// luz ambiente
+			var ambientLight = new THREE.AmbientLight (0xFFFFFF,0.2);
+			ambientLight.castShadow = true;
+            scene.add(ambientLight);
+
+			// spotlight
+			var spotLight1 = new THREE.SpotLight( 0xffcc99, 3.5);
+			spotLight1.position.set(-10,5,-200);
+			spotLight1.castShadow = true; 
+			scene.add(spotLight1);
+
+			spotLight1.shadow.mapSize.width = 512;
+			spotLight1.shadow.mapSize.height = 512;
+			spotLight1.shadow.camera.near = 0.5; 
+			spotLight1.shadow.camera.far = 500   
+	
+			createObjects(scene);
+
+			renderScene ();
+
+			function renderScene () {
+				requestAnimationFrame(renderScene);
+				renderer.render( scene, camera );
+			}
+
+			
+			// função que invoca uma função de cada vez que uma tecla é pressionada
+			function onKeyDown(k)
+			{
+				switch(k.keyCode)
+				{
+					case 37:			// seta esquerda - rotação para esquerda
+						rotate(0, -1);
+						break;
+					case 39:			// seta direita - rotação para direita
+						rotate(0, 1);
+						break;
+					case 38:			// seta cima - translação cima
+						rotate(-1, 0);
+						break;
+					case 40:			// seta baixo - translação baixo
+						rotate(1, 0);
+						break;
+					case 33:			// page up - aumenta tamanho
+						scale();
+						break;
+					case 34:			// page down - diminui tamanho
+						scale2();
+						break;
+					case 13: 			// reset aos objectos	
+						reset();
+				}
+			}
+			
+			// detecta se teclas foram pressionadas
+			window.addEventListener('keydown', onKeyDown, false);
+
+			// função que roda a cabana 
+			function rotate(x, y)
+			{
+				rotationObject.rotation.x+=x*0.05;
+				rotationObject.rotation.y+=y*0.05;
+			}
+
+			// função que aumenta o tamanho das árvores até um determinado ponto
+			function scale () 
+			{
+				if (scaleObject.scale.y < 1.3 )
+				{
+				scaleObject.scale.y+=0.05;
+				}
+
+			}
+
+			// função que diminui o tamanho das árvores até um determinado ponto
+			function scale2 ()
+			{
+				if (scaleObject.scale.y > 0.5 )
+				{
+				scaleObject.scale.y-=0.05;
+				}
+			}
+
+			// reset
+			function reset()
+			{
+				rotationObject.rotation.x=0;
+				rotationObject.rotation.y=0;
+				scaleObject.scale.y=1;
+			}
+
+			//função que cria os objectos 
+			function createObjects (scene)  {
+
+			rotationObject = new THREE.Object3D();
+    		scene.add(rotationObject);
+
+			scaleObject = new THREE.Object3D();
+    		scene.add(scaleObject);
+			
+
+			// fundo
+			var geometry = new THREE.BoxBufferGeometry( 50, 1, 50 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/chao.jpg")});
+			var base5 = new THREE.Mesh( geometry, material );
+			base5.castShadow = true;
+			base5.receiveShadow = true;
+			base5.position.set(10,-30,0);
+			base5.rotation.set(0,0,0);
+			rotationObject.add(base5);
+
+			// parede
+			var geometry = new THREE.BoxBufferGeometry( 50, 1, 30 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/chao.jpg")});
+			var base5 = new THREE.Mesh( geometry, material );
+			base5.castShadow = true;
+			base5.receiveShadow = true;
+			base5.position.set(10,-15.5,25.5);
+			base5.rotation.set(1.57,0,0);
+			rotationObject.add(base5);
+
+			// parede
+			var geometry = new THREE.BoxBufferGeometry( 50, 1, 30 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/chao.jpg")});
+			var base5 = new THREE.Mesh( geometry, material );
+			base5.castShadow = true;
+			base5.receiveShadow = true;
+			base5.position.set(10,-15.5,-25.5);
+			base5.rotation.set(1.57,0,0);
+			rotationObject.add(base5);
+
+			// parede
+			var geometry = new THREE.BoxBufferGeometry( 52, 1, 30 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/chao.jpg")});
+			var base5 = new THREE.Mesh( geometry, material );
+			base5.castShadow = true;
+			base5.receiveShadow = true;
+			base5.position.set(35.5,-15.5,0);
+			base5.rotation.set(1.57,0,1.57);
+			
+
+			// telhado
+			var geometry = new THREE.BoxBufferGeometry( 50, 1, 30 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/chao.jpg")});
+			var base5 = new THREE.Mesh( geometry, material );
+			base5.castShadow = true;
+			base5.receiveShadow = true;
+			base5.position.set(10,4,-14);
+			base5.rotation.set(2.8,0,0);
+			rotationObject.add(base5);
+
+			// telhado
+			var geometry = new THREE.BoxBufferGeometry( 50, 1, 30 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/chao.jpg")});
+			var base5 = new THREE.Mesh( geometry, material );
+			base5.castShadow = true;
+			base5.receiveShadow = true;
+			base5.position.set(10,4,14);
+			base5.rotation.set(-2.8,0,0);
+			rotationObject.add(base5);
+
+
+			// base
+			var geometry = new THREE.PlaneBufferGeometry( 350, 150, 32 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/chao2.jpg"), side: THREE.DoubleSide});
+			var plane = new THREE.Mesh( geometry, material );
+			plane.receiveShadow = true;
+			plane.position.set(10,-30,0);
+			plane.rotation.set(1.57,0,0);
+			rotationObject.add(plane);
+			scene.add(plane);
+
+
+
+			// skybox
+			var geometry = new THREE.BoxGeometry( 1000, 500, 500 );
+            var cubeMaterials = 
+            [
+                new THREE.MeshBasicMaterial ({map: new THREE.TextureLoader().load("images/mountains-clouds-sundown-1.jpg"), side: THREE.DoubleSide}),
+                new THREE.MeshPhongMaterial ({map: new THREE.TextureLoader().load("images/mountains-clouds-sundown-1.jpg"), side: THREE.DoubleSide}),
+                new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/mountains-clouds-sundown-1.jpg"), side: THREE.DoubleSide}),
+                new THREE.MeshBasicMaterial ({ color: 0xFFFFFF, side: THREE.DoubleSide}),
+                new THREE.MeshBasicMaterial ({map: new THREE.TextureLoader().load("images/mountains-clouds-sundown-1.jpg"), side: THREE.DoubleSide}),
+                new THREE.MeshBasicMaterial ({map: new THREE.TextureLoader().load("images/mountains-clouds-sundown-1.jpg"), side: THREE.DoubleSide}),
+
+            ]
+            
+            var material = new THREE.MeshFaceMaterial (cubeMaterials);
+			var cube = new THREE.Mesh(geometry, material);
+            scene.add( cube );
+
+			// esfera
+			var geometry = new THREE.SphereBufferGeometry(5,32,32);
+			var material = new THREE.MeshLambertMaterial ({opacity: 0.3,transparent: true, side: THREE.DoubleSide});
+			var sphere = new THREE.Mesh (geometry,material);
+			sphere.castShadow = true;
+			sphere.position.set(0,-25,-20);
+			scene.add(sphere);
+
+
+			// copa arvore
+			var geometry = new THREE.ConeBufferGeometry( 15, 50, 32 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/pinheiro.jpg")});
+			var cone = new THREE.Mesh( geometry, material );
+			cone.castShadow = true;
+			cone.position.set(-50,5,0);
+			scaleObject.add(cone);
+
+			// tronco
+			var geometry = new THREE.CylinderBufferGeometry( 1.5, 1.5, 60, 32 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/chao.jpg")});
+			var cylinder = new THREE.Mesh( geometry, material );
+			cylinder.castShadow = true;
+			cylinder.position.set(-50,-30,0);
+			scaleObject.add(cylinder);
+
+			// copa arvore
+			var geometry = new THREE.ConeBufferGeometry( 15, 50, 32 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/pinheiro.jpg")});
+			var cone = new THREE.Mesh( geometry, material );
+			cone.castShadow = true;
+			cone.position.set(60,5,0);
+			scaleObject.add(cone);
+
+			// tronco
+			var geometry = new THREE.CylinderBufferGeometry( 1.5, 1.5, 60, 32 );
+			var material = new THREE.MeshLambertMaterial ({map: new THREE.TextureLoader().load("images/chao.jpg")});
+			var cylinder = new THREE.Mesh( geometry, material );
+			cylinder.castShadow = true;
+			cylinder.position.set(60,-30,0);
+			scaleObject.add(cylinder);
+
+			}
+
+		</script>
+
+	</body>
+</html>
